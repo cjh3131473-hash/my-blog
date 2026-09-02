@@ -1,0 +1,14 @@
+node_modules/
+dist/
+
+# Claude Code 로컬 설정 — 권한 목록과 node 절대 경로라 이 PC 전용이다
+.claude/settings.local.json
+.claude/launch.json
+
+# 초안. 공개 저장소에 원문이 올라가지 않게 한다.
+# draft: true 인 글을 새로 만들면 이 목록에도 추가한다.
+posts/2026-08-10-reading-notes.md
+posts/2026-08-20-atomic-notes.md
+posts/2026-08-20-ontology.md
+posts/2026-08-20-retrieval-practice.md
+posts/2026-08-20-zettelkasten.md
