@@ -114,7 +114,7 @@ if (WATCH) {
     }, 120);
   };
 
-  for (const dir of ['posts', 'src']) {
+  for (const dir of ['posts', 'src', 'apps']) {
     watch(path.join(ROOT, dir), { recursive: true }, (_event, filename) => {
       // dist/ 로 복사된 결과물이 다시 빌드를 부르지 않도록 원본만 본다.
       if (filename) scheduleBuild();

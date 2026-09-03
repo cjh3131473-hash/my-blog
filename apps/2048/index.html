@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>2048</title>
+<script>
+  // FOUC 방지: CSS 로드 전에 저장된 테마를 반영한다. 시스템 설정을 따르는
+  // 경우(저장값 없음)는 CSS의 prefers-color-scheme 미디어 쿼리가 처리하므로
+  // 여기서는 속성을 지정하지 않는다.
+  (function () {
+    try {
+      var theme = localStorage.getItem('2048-theme');
+      if (theme === 'dark' || theme === 'light') {
+        document.documentElement.setAttribute('data-theme', theme);
+      }
+    } catch (e) {}
+  })();
+</script>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="site-header">
+  <h1>2048</h1>
+  <div class="header-controls">
+    <div class="scoreboard" role="status" aria-live="polite" aria-atomic="true">
+      <div class="score-box">
+        <span class="score-label">SCORE</span>
+        <span class="score-value" id="score">0</span>
+      </div>
+      <div class="score-box">
+        <span class="score-label">BEST</span>
+        <span class="score-value" id="best">0</span>
+      </div>
+    </div>
+    <button type="button" id="theme-toggle" class="theme-toggle" aria-label="테마 전환"><span aria-hidden="true">&#9680;</span></button>
+  </div>
+</header>
+<main>
+  <div class="board-wrap">
+    <div class="board" id="board" aria-label="2048 게임 보드, 4행 4열. 각 타일의 숫자가 텍스트로 표시됩니다."></div>
+    <div class="overlay" id="overlay" hidden role="alert">
+      <p class="overlay-message" id="overlay-message"></p>
+      <div class="overlay-buttons" id="overlay-buttons"></div>
+    </div>
+  </div>
+  <p class="instructions">방향키 또는 화면 스와이프로 타일을 밀어보세요. 같은 숫자가 만나면 합쳐지고, 2048 타일을 만들면 승리합니다.</p>
+  <button type="button" id="restart" class="restart-button">다시 시작</button>
+</main>
+<script src="script.js"></script>
+</body>
+</html>

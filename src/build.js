@@ -10,9 +10,13 @@ import { escapeHtml, render, slugify } from './lib/template.js';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const POSTS_DIR = path.join(ROOT, 'posts');
+const APPS_DIR = path.join(ROOT, 'apps');
 const DIST_DIR = path.join(ROOT, 'dist');
 const TEMPLATE_DIR = path.join(ROOT, 'src', 'templates');
 const ASSETS_DIR = path.join(ROOT, 'src', 'assets');
+
+// Plan/Review 산출물은 앱 폴더 안에 있지만 배포물이 아니다 — dist 로 복사하지 않는다.
+const APP_META_FILES = new Set(['spec.md', 'review.md']);
 
 // 배포 위치가 정해지지 않았으므로 모든 경로는 상대 경로다.
 // 페이지 깊이에 따라 이 접두사를 앞에 붙인다. 루트는 '', 한 단계 아래는 '../'.
@@ -101,6 +105,50 @@ async function readPosts() {
   return { posts, drafts };
 }
 
+function appItemsHtml(apps, base) {
+  return apps
+    .map(
+      (app) => `  <li class="app-item">
+    <article>
+      <h2><a href="${base}apps/${escapeHtml(app.slug)}/index.html">${escapeHtml(app.title)}</a></h2>
+      <p class="app-excerpt">${escapeHtml(app.description)}</p>
+      <div class="app-preview">
+        <iframe src="${base}apps/${escapeHtml(app.slug)}/index.html" title="${escapeHtml(app.title)} 미리보기" loading="lazy"></iframe>
+      </div>
+    </article>
+  </li>`,
+    )
+    .join('\n');
+}
+
+function appSectionHtml(apps, base) {
+  if (apps.length === 0) return '';
+  return `<section class="app-section" aria-labelledby="apps-heading">
+  <h2 id="apps-heading" class="section-heading">미니 웹앱</h2>
+  <ul class="app-list">
+${appItemsHtml(apps, base)}
+  </ul>
+</section>`;
+}
+
+// apps/{slug}/index.html 이 없으면 site.config.js 오타를 빌드에서 잡는다.
+async function copyApps(apps) {
+  for (const app of apps) {
+    const srcDir = path.join(APPS_DIR, app.slug);
+    try {
+      await fs.access(path.join(srcDir, 'index.html'));
+    } catch {
+      throw new Error(
+        `site.config.js: apps 항목 "${app.slug}" 에 해당하는 apps/${app.slug}/index.html 을 찾을 수 없습니다.`,
+      );
+    }
+    await fs.cp(srcDir, path.join(DIST_DIR, 'apps', app.slug), {
+      recursive: true,
+      filter: (source) => !APP_META_FILES.has(path.basename(source)),
+    });
+  }
+}
+
 function tagListHtml(tags, base) {
   if (tags.length === 0) return '';
   const items = tags
@@ -177,6 +225,9 @@ async function build() {
   await fs.rm(DIST_DIR, { recursive: true, force: true });
   await fs.mkdir(DIST_DIR, { recursive: true });
 
+  const apps = site.apps ?? [];
+  await copyApps(apps);
+
   // 목록 페이지
   await writePage(
     'index.html',
@@ -191,6 +242,7 @@ async function build() {
         {
           siteName: site.title,
           siteDescription: site.description,
+          appSection: appSectionHtml(apps, ROOT_BASE),
           postItems: postItemsHtml(posts, ROOT_BASE),
         },
         'index.html',
@@ -298,7 +350,7 @@ async function build() {
 
   const elapsed = Date.now() - started;
   console.log(
-    `빌드 완료 — 글 ${posts.length}개, 태그 ${byTag.size}개, draft ${drafts.length}개 건너뜀 (${elapsed}ms)`,
+    `빌드 완료 — 글 ${posts.length}개, 앱 ${apps.length}개, 태그 ${byTag.size}개, draft ${drafts.length}개 건너뜀 (${elapsed}ms)`,
   );
   if (drafts.length > 0) console.log(`  건너뛴 draft: ${drafts.join(', ')}`);
 }

@@ -1,0 +1,353 @@
+/* ===== 토큰 ===== */
+:root {
+  --bg: #fdfdfc;
+  --bg-subtle: #f4f4f2;
+  --text: #1a1a18;
+  --text-muted: #6b6b66;
+  --border: #e4e4e0;
+  --accent: #2f6f4e;
+  --accent-text: #ffffff;
+  --focus-ring: #2f6f4e;
+
+  --board-bg: #cdc0b4;
+  --cell-bg: rgba(238, 228, 218, 0.7);
+  --overlay-bg: rgba(253, 253, 252, 0.94);
+
+  --tile-2: #eee4da;
+  --tile-4: #ede0c8;
+  --tile-8: #f2b179;
+  --tile-16: #f59563;
+  --tile-32: #f67c5f;
+  --tile-64: #f65e3b;
+  --tile-128: #edcf72;
+  --tile-256: #edcc61;
+  --tile-512: #edc850;
+  --tile-1024: #edc53f;
+  --tile-2048: #edc22e;
+  --tile-super: #3c3a32;
+  /* 2..2048 타일은 옅은/채도 높은 배경이라 어두운 글자가, super(4096+)
+     타일은 어두운 배경이라 밝은 글자가 4.5:1 이상을 만족한다. */
+  --tile-text-primary: #1a1a18;
+  --tile-text-super: #fdfaf5;
+}
+
+:root[data-theme="dark"] {
+  --bg: #161614;
+  --bg-subtle: #201f1c;
+  --text: #f0f0ee;
+  --text-muted: #a3a39c;
+  --border: #33332e;
+  --accent: #4f9d76;
+  --accent-text: #0d1a13;
+  --focus-ring: #4f9d76;
+
+  --board-bg: #2e2a24;
+  --cell-bg: rgba(255, 255, 255, 0.06);
+  --overlay-bg: rgba(22, 22, 20, 0.92);
+
+  --tile-2: #5e544a;
+  --tile-4: #735d4a;
+  --tile-8: #9b5e3b;
+  --tile-16: #a65030;
+  --tile-32: #b2402a;
+  --tile-64: #bc3324;
+  --tile-128: #826726;
+  --tile-256: #80681e;
+  --tile-512: #786517;
+  --tile-1024: #736311;
+  --tile-2048: #6e610c;
+  --tile-super: #ece6d5;
+  /* 다크에서는 명암이 뒤집힌다: 2..2048은 어두운 배경 + 밝은 글자,
+     super는 밝은 배경 + 어두운 글자. */
+  --tile-text-primary: #f5f2ea;
+  --tile-text-super: #161614;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #161614;
+    --bg-subtle: #201f1c;
+    --text: #f0f0ee;
+    --text-muted: #a3a39c;
+    --border: #33332e;
+    --accent: #4f9d76;
+    --accent-text: #0d1a13;
+    --focus-ring: #4f9d76;
+
+    --board-bg: #2e2a24;
+    --cell-bg: rgba(255, 255, 255, 0.06);
+    --overlay-bg: rgba(22, 22, 20, 0.92);
+
+    --tile-2: #5e544a;
+    --tile-4: #735d4a;
+    --tile-8: #9b5e3b;
+    --tile-16: #a65030;
+    --tile-32: #b2402a;
+    --tile-64: #bc3324;
+    --tile-128: #826726;
+    --tile-256: #80681e;
+    --tile-512: #786517;
+    --tile-1024: #736311;
+    --tile-2048: #6e610c;
+    --tile-super: #ece6d5;
+    --tile-text-primary: #f5f2ea;
+    --tile-text-super: #161614;
+  }
+}
+
+/* ===== 리셋 ===== */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--text);
+}
+
+button {
+  font: inherit;
+  color: inherit;
+}
+
+/* ===== 레이아웃 ===== */
+header,
+main {
+  max-width: 30rem;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.site-header {
+  padding-top: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.header-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+main {
+  padding-top: 1rem;
+  padding-bottom: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.board-wrap {
+  position: relative;
+  width: 100%;
+  max-width: 26rem;
+}
+
+.board {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: repeat(4, 1fr);
+  gap: clamp(6px, 2vw, 12px);
+  padding: clamp(6px, 2vw, 12px);
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  background: var(--board-bg);
+  border-radius: 10px;
+}
+
+/* ===== 타이포 ===== */
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Malgun Gothic",
+    "Apple SD Gothic Neo", sans-serif;
+  line-height: 1.5;
+}
+
+h1 {
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.instructions {
+  max-width: 32ch;
+  margin: 0;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+/* ===== 컴포넌트 ===== */
+.scoreboard {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.score-box {
+  min-width: 4.5rem;
+  padding: 0.4rem 0.75rem;
+  background: var(--bg-subtle);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  text-align: center;
+}
+
+.score-label {
+  display: block;
+  font-size: 0.65rem;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+}
+
+.score-value {
+  display: block;
+  font-size: 1.15rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.theme-toggle {
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  background: var(--bg-subtle);
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: background-color 150ms ease;
+}
+
+.theme-toggle:hover {
+  background: var(--border);
+}
+
+.cell {
+  background: var(--cell-bg);
+  border-radius: 6px;
+}
+
+.tile {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  font-weight: 700;
+  font-size: clamp(1rem, 6vw, 1.8rem);
+  font-variant-numeric: tabular-nums;
+  background: var(--tile-super);
+  color: var(--tile-text-super);
+}
+
+.tile[data-value="2"] { background: var(--tile-2); color: var(--tile-text-primary); }
+.tile[data-value="4"] { background: var(--tile-4); color: var(--tile-text-primary); }
+.tile[data-value="8"] { background: var(--tile-8); color: var(--tile-text-primary); }
+.tile[data-value="16"] { background: var(--tile-16); color: var(--tile-text-primary); }
+.tile[data-value="32"] { background: var(--tile-32); color: var(--tile-text-primary); }
+.tile[data-value="64"] { background: var(--tile-64); color: var(--tile-text-primary); }
+.tile[data-value="128"] { background: var(--tile-128); color: var(--tile-text-primary); }
+.tile[data-value="256"] { background: var(--tile-256); color: var(--tile-text-primary); }
+.tile[data-value="512"] { background: var(--tile-512); color: var(--tile-text-primary); }
+.tile[data-value="1024"] { background: var(--tile-1024); color: var(--tile-text-primary); }
+.tile[data-value="2048"] { background: var(--tile-2048); color: var(--tile-text-primary); }
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 1.5rem;
+  text-align: center;
+  background: var(--overlay-bg);
+  border-radius: 10px;
+}
+
+.overlay[hidden] {
+  display: none;
+}
+
+.overlay-message {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+.overlay-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  justify-content: center;
+}
+
+.overlay-button,
+.restart-button {
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0.5rem 1.25rem;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: var(--accent);
+  color: var(--accent-text);
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 150ms ease;
+}
+
+.overlay-button:hover,
+.restart-button:hover {
+  opacity: 0.88;
+}
+
+:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+/* ===== 애니메이션 ===== */
+@keyframes tile-pop {
+  from { transform: scale(0.5); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+@keyframes tile-merge-pop {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.15); }
+  100% { transform: scale(1); }
+}
+
+.tile-new {
+  animation: tile-pop 150ms ease-out;
+}
+
+.tile-merged {
+  animation: tile-merge-pop 150ms ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ===== 미디어 쿼리 ===== */
+@media (min-width: 480px) {
+  .site-header {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
