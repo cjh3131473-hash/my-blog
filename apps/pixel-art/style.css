@@ -1,0 +1,388 @@
+/* ===== 토큰 ===== */
+/* 팔레트 16색은 여기에 없다. 그림 데이터이므로 테마에 따라 바뀌면 안 되고,
+   script.js 의 상수 배열에 둔다. 여기 토큰은 UI 색만 담당한다. */
+:root {
+  --bg: #fdfdfc;
+  --bg-subtle: #f4f4f2;
+  --text: #1a1a18;
+  --text-muted: #6b6b66;
+  --border: #e4e4e0;
+  --accent: #2f6f4e;
+  --accent-text: #ffffff;
+  --focus-ring: #2f6f4e;
+
+  --grid-line: #cfcfc9;
+  --checker-a: #ffffff;
+  --checker-b: #eeeeea;
+
+  /* 스와치 테두리는 배경과 3:1 이상이어야 흰색(#ffffff) 스와치가 페이지
+     배경에 묻히지 않는다. --border 로는 1.25:1 밖에 나오지 않았다. */
+  --swatch-border: #8f8f89;
+  --swatch-ring: #fdfdfc;
+  --swatch-mark: #fdfdfc;
+  --swatch-mark-outline: #1a1a18;
+}
+
+:root[data-theme="dark"] {
+  --bg: #161614;
+  --bg-subtle: #201f1c;
+  --text: #f0f0ee;
+  --text-muted: #a3a39c;
+  --border: #33332e;
+  --accent: #4f9d76;
+  --accent-text: #0d1a13;
+  --focus-ring: #4f9d76;
+
+  --grid-line: #46463f;
+  /* 밝은 체커보드를 어두운 화면에 그대로 두면 빈 칸이 눈부시게 튄다. */
+  --checker-a: #232320;
+  --checker-b: #1c1c1a;
+
+  /* 다크에서는 먹색(#1b1b1b) 스와치가 배경에 묻히는 쪽이라 같은 이유로 밝힌다. */
+  --swatch-border: #70706a;
+  --swatch-ring: #201f1c;
+  --swatch-mark: #e8e8e4;
+  --swatch-mark-outline: #161614;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #161614;
+    --bg-subtle: #201f1c;
+    --text: #f0f0ee;
+    --text-muted: #a3a39c;
+    --border: #33332e;
+    --accent: #4f9d76;
+    --accent-text: #0d1a13;
+    --focus-ring: #4f9d76;
+
+    --grid-line: #46463f;
+    --checker-a: #232320;
+    --checker-b: #1c1c1a;
+
+    --swatch-border: #70706a;
+    --swatch-ring: #201f1c;
+    --swatch-mark: #e8e8e4;
+    --swatch-mark-outline: #161614;
+  }
+}
+
+/* ===== 리셋 ===== */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--text);
+}
+
+button {
+  font: inherit;
+  color: inherit;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* ===== 레이아웃 ===== */
+header,
+main {
+  max-width: 60rem;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.site-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding-top: 1.25rem;
+}
+
+main {
+  padding-top: 1rem;
+  padding-bottom: 2.5rem;
+}
+
+.editor {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.canvas-panel {
+  display: flex;
+  justify-content: center;
+}
+
+.side-panel {
+  display: grid;
+  gap: 1.5rem;
+  align-content: start;
+}
+
+.panel-section {
+  display: grid;
+  gap: 0.6rem;
+}
+
+/* ===== 타이포 ===== */
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Malgun Gothic",
+    "Apple SD Gothic Neo", sans-serif;
+  line-height: 1.6;
+}
+
+h1 {
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.section-heading {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--text-muted);
+}
+
+.status-line {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.save-message {
+  color: var(--accent);
+}
+
+.save-message:not(:empty)::before {
+  content: " · ";
+  color: var(--text-muted);
+}
+
+.help-list {
+  margin: 0;
+  padding-left: 1.1rem;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+.noscript-note {
+  margin: 0 0 1rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg-subtle);
+}
+
+/* ===== 컴포넌트 ===== */
+.theme-toggle {
+  flex-shrink: 0;
+  width: 2.75rem;
+  height: 2.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  background: var(--bg-subtle);
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: background-color 120ms ease;
+}
+
+.theme-toggle:hover {
+  background: var(--border);
+}
+
+/* 격자선은 컨테이너 배경 + 1px gap 으로 그린다. 칸 폭이 소수점으로 떨어져도
+   선 두께는 정확히 1px 로 고정되고, 칸마다 inset 그림자를 넣을 때처럼
+   내부 선이 두 겹으로 겹쳐 보이는 문제도 없다. */
+.pixel-grid {
+  display: grid;
+  grid-template-rows: repeat(16, 1fr);
+  gap: 1px;
+  padding: 1px;
+  width: min(100%, 30rem);
+  aspect-ratio: 1 / 1;
+  background: var(--grid-line);
+  border-radius: 4px;
+  touch-action: none;
+}
+
+.pixel-row {
+  display: grid;
+  grid-template-columns: repeat(16, 1fr);
+  gap: 1px;
+}
+
+.grid-cell {
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background-color: var(--checker-a);
+  background-image: repeating-conic-gradient(
+    var(--checker-a) 0% 25%,
+    var(--checker-b) 0% 50%
+  );
+  cursor: crosshair;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* 칠해진 칸은 체커보드를 덮는다. background-image 는 background-color 위에
+   그려지므로 색만 바꿔서는 가려지지 않는다. */
+.grid-cell.is-filled {
+  background-image: none;
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.tool-button {
+  min-width: 2.75rem;
+  min-height: 2.75rem;
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg-subtle);
+  cursor: pointer;
+  transition: background-color 120ms ease;
+}
+
+.tool-button:hover {
+  background: var(--border);
+}
+
+.tool-button[aria-pressed="true"],
+.tool-button-primary {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--accent-text);
+}
+
+.tool-button[aria-pressed="true"]:hover,
+.tool-button-primary:hover {
+  background: var(--accent);
+  opacity: 0.88;
+}
+
+/* radiogroup 은 radio 만 자식으로 가져야 한다. 커스텀 색 input 을 그룹 밖에
+   두면서도 스와치들이 .palette 그리드 칸을 그대로 쓰게 하는 래퍼다. */
+.palette-radios {
+  display: contents;
+}
+
+.palette {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(2.75rem, 1fr));
+  gap: 0.4rem;
+}
+
+.palette-swatch,
+.custom-swatch {
+  position: relative;
+  min-width: 0;
+  min-height: 2.75rem;
+  padding: 0;
+  border: 1px solid var(--swatch-border);
+  border-radius: 5px;
+  cursor: pointer;
+  transition: box-shadow 120ms ease;
+}
+
+/* 선택 표시를 색에만 의존하지 않게 한다: 배경색 링 + 강조색 링(이중 외곽선)에
+   더해 가운데 표식을 함께 그린다. */
+.palette-swatch[aria-checked="true"],
+.custom-swatch.is-selected {
+  box-shadow: 0 0 0 2px var(--swatch-ring), 0 0 0 4px var(--accent);
+}
+
+.palette-swatch[aria-checked="true"]::after,
+.custom-swatch.is-selected::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0.7rem;
+  height: 0.7rem;
+  transform: translate(-50%, -50%);
+  border-radius: 2px;
+  /* 어떤 스와치 색 위에서도 보이도록 밝은 면 + 어두운 테두리로 그린다. */
+  background: var(--swatch-mark);
+  box-shadow: 0 0 0 2px var(--swatch-mark-outline);
+  pointer-events: none;
+}
+
+.custom-swatch {
+  display: flex;
+  background: var(--bg-subtle);
+}
+
+.custom-swatch input[type="color"] {
+  display: block;
+  width: 100%;
+  min-height: 2.6rem;
+  padding: 2px;
+  border: 0;
+  border-radius: 4px;
+  background: none;
+  cursor: pointer;
+}
+
+.custom-swatch input[type="color"]::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+
+.custom-swatch input[type="color"]::-webkit-color-swatch {
+  border: 0;
+  border-radius: 3px;
+}
+
+.custom-swatch input[type="color"]::-moz-color-swatch {
+  border: 0;
+  border-radius: 3px;
+}
+
+:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+/* 포커스 링이 칸 밖으로 살짝 넘치게 해서 칠해진 색을 가리지 않는다. */
+.grid-cell:focus-visible {
+  position: relative;
+  z-index: 1;
+  outline-offset: 1px;
+}
+
+/* ===== 미디어 쿼리 ===== */
+@media (min-width: 48rem) {
+  .editor {
+    grid-template-columns: minmax(0, 30rem) minmax(0, 1fr);
+    align-items: start;
+    gap: 2rem;
+  }
+
+  .canvas-panel {
+    justify-content: flex-start;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

@@ -19,5 +19,10 @@ export default {
       title: '2048',
       description: '방향키로 숫자 타일을 밀어 합치는 퍼즐 게임. 점수판 포함.',
     },
+    {
+      slug: 'pixel-art',
+      title: '픽셀 아트 에디터',
+      description: '16×16 격자에 도트를 찍어 그림을 그리고 PNG로 저장한다. 16색 팔레트와 사용자 지정 색.',
+    },
   ],
 };

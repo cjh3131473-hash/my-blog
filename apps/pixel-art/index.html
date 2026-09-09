@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>픽셀 아트 에디터</title>
+<script>
+  // FOUC 방지: CSS 로드 전에 저장된 테마를 반영한다. 시스템 설정을 따르는
+  // 경우(저장값 없음)는 CSS의 prefers-color-scheme 미디어 쿼리가 처리하므로
+  // 여기서는 속성을 지정하지 않는다.
+  (function () {
+    try {
+      var theme = localStorage.getItem('pixel-art-theme');
+      if (theme === 'dark' || theme === 'light') {
+        document.documentElement.setAttribute('data-theme', theme);
+      }
+    } catch (e) {}
+  })();
+</script>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="site-header">
+  <h1>픽셀 아트 에디터</h1>
+  <button type="button" id="theme-toggle" class="theme-toggle" aria-label="테마 전환"><span aria-hidden="true">&#9680;</span></button>
+</header>
+<main>
+  <noscript>
+    <p class="noscript-note">이 도구는 자바스크립트가 필요합니다. 브라우저에서 자바스크립트를 켜면 격자에 그림을 그릴 수 있습니다.</p>
+  </noscript>
+
+  <div class="editor">
+    <div class="canvas-panel">
+      <div class="pixel-grid" id="grid" role="grid" aria-label="픽셀 격자, 16행 16열"></div>
+    </div>
+
+    <div class="side-panel">
+      <section class="panel-section" aria-labelledby="tools-heading">
+        <h2 class="section-heading" id="tools-heading">도구</h2>
+        <div class="toolbar">
+          <button type="button" id="eraser" class="tool-button" aria-pressed="false">지우개</button>
+          <button type="button" id="clear-all" class="tool-button">모두 지우기</button>
+          <button type="button" id="save-png" class="tool-button tool-button-primary">PNG 저장</button>
+        </div>
+      </section>
+
+      <section class="panel-section" aria-labelledby="palette-heading">
+        <h2 class="section-heading" id="palette-heading">색상</h2>
+        <div class="palette" id="palette">
+          <!-- radiogroup 의 필수 자식은 radio 뿐이라 커스텀 색 input 을 밖으로 뺀다.
+               래퍼는 display:contents 라서 스와치가 .palette 그리드 칸을 그대로 쓴다. -->
+          <div class="palette-radios" id="palette-radios" role="radiogroup" aria-labelledby="palette-heading"></div>
+        </div>
+        <p class="status-line" id="status" role="status" aria-live="polite">
+          <span id="current-color-text"></span>
+          <span class="save-message" id="save-message"></span>
+        </p>
+      </section>
+
+      <section class="panel-section" aria-labelledby="help-heading">
+        <h2 class="section-heading" id="help-heading">조작 안내</h2>
+        <ul class="help-list">
+          <li>격자를 누르거나 드래그하면 선택한 색으로 칠해집니다.</li>
+          <li>키보드: 방향키로 이동, Enter 또는 Space로 칠하기, Backspace로 지우기.</li>
+          <li>Shift와 방향키를 함께 누르면 이동하면서 이어 칠합니다.</li>
+          <li>체커 무늬로 보이는 빈 칸은 PNG에서 투명하게 저장됩니다.</li>
+        </ul>
+      </section>
+    </div>
+  </div>
+</main>
+<script src="script.js"></script>
+</body>
+</html>
